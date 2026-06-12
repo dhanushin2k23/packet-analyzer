@@ -1,3 +1,5 @@
+#This program works for the security check. Checks counts and return statement accordingly.
+
 def detect_suspicious_activity(protocol_data,port_data):
 
     alerts = []

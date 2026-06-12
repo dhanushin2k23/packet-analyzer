@@ -1,5 +1,6 @@
-from scapy.all import rdpcap
+#It parse all the data from the given file and return the data.
 
+from scapy.all import rdpcap
 from app.services.protocol_analyzer import analyze_protocols
 from app.services.ip_analyzer import analyze_ips
 from app.services.port_analyzer import analyze_ports

@@ -1,3 +1,5 @@
+#It counts the total number of TCP,UDP,ICMP and total percentages of these.
+
 from scapy.layers.inet import TCP, UDP, ICMP
 
 def analyze_protocols(packets):

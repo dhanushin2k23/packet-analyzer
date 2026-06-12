@@ -1,3 +1,5 @@
+#This program checks the services of ports and provide analysis.
+
 from collections import Counter
 from scapy.layers.inet import TCP, UDP
 

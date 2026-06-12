@@ -1,3 +1,5 @@
+#This program counts the number of IPs in source,destination
+
 from collections import Counter
 from scapy.layers.inet import IP
 

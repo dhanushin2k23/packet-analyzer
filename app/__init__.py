@@ -3,11 +3,15 @@ import os
 from app.database import db
 from app.models import AnalysisReport
 from app.services.pcap_parser import analyze_pcap
-
+from app.auth.routes import auth
+from app.extensions import jwt,bcrypt
+from flask_jwt_extended import jwt_required, get_jwt_identity
 
 def create_app():
 
     app = Flask(__name__)
+
+    app.config["JWT_SECRET_KEY"] = "packet-analyzer-secret-key"
 
     app.config["SQLALCHEMY_DATABASE_URI"] = (
         "postgresql://postgres:BASKETBALL#23@localhost/packet_analyzer"
@@ -16,12 +20,18 @@ def create_app():
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
     db.init_app(app)
+    bcrypt.init_app(app)
+    jwt.init_app(app)
+    app.register_blueprint(auth)
 
     with app.app_context():
         db.create_all()
 
     @app.route("/upload", methods=["POST"])
+    @jwt_required()
     def upload():
+
+        current_user = get_jwt_identity()
 
         file = request.files.get("file")
 
@@ -41,20 +51,59 @@ def create_app():
 
         report = AnalysisReport(
             filename=file.filename,
+
             total_packets=result["total_packets"],
+
             tcp_packets=result["tcp_packets"],
+
             udp_packets=result["udp_packets"],
+
             icmp_packets=result["icmp_packets"],
-            top_source_ips=result["top_source_ips"],
-            top_destination_ips=result["top_destination_ips"],
-            top_destination_ports=result["top_destination_ports"],
+
             protocol_percentages=result["protocol_percentages"],
+
+            top_source_ips=result["top_source_ips"],
+
+            top_destination_ips=result["top_destination_ips"],
+
+            top_destination_ports=result["top_destination_ports"],
+
             security_alerts=result["security_alerts"]
-        )       
+        )
+
 
         db.session.add(report)
         db.session.commit()
 
-        return jsonify(result)
+        result["uploaded_by"] = current_user
+
+        return jsonify({
+            "report_id": report.id,
+            **result
+        })
+
+    @app.route("/reports/<int:report_id>",methods=["GET"])
+    def get_report(report_id):
+        report = AnalysisReport.query.get(report_id)
+
+        if report is None:
+            return jsonify({
+                "error":"Report not found"
+            }),404
+
+        return jsonify({
+            "id": report.id,
+            "filename": report.filename,
+            "total_packets": report.total_packets,
+            "tcp_packets": report.tcp_packets,
+            "udp_packets": report.udp_packets,
+            "icmp_packets": report.icmp_packets,
+            "top_source_ips": report.top_source_ips,
+            "top_destination_ips": report.top_destination_ips,
+            "top_destination_ports": report.top_destination_ports,
+            "protocol_percentages": report.protocol_percentages,
+            "security_alerts": report.security_alerts,
+            "created_at": report.created_at
+        })
 
     return app

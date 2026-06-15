@@ -57,6 +57,7 @@ def register():
 
 @auth.route("/login", methods=["POST"])
 def login():
+
     data = request.get_json()
 
     email = data.get("email")
@@ -68,16 +69,16 @@ def login():
     ).first()
 
 
-    if user is None:
+    if not user:
         return jsonify({
-            "error": "Invalid credentials"
-        }), 401
+            "error":"Invalid credentials"
+        }),401
 
 
     if not user.check_password(password):
         return jsonify({
-            "error": "Invalid credentials"
-        }), 401
+            "error":"Invalid credentials"
+        }),401
 
 
     token = create_access_token(
@@ -86,5 +87,5 @@ def login():
 
 
     return jsonify({
-        "access_token": token
+        "access_token":token
     })

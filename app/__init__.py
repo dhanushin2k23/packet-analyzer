@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify
 import os
-
+from flask_cors import CORS
 from app.database import db
 from app.models import AnalysisReport
 from app.services.pcap_parser import analyze_pcap
@@ -18,7 +18,7 @@ from flask_jwt_extended import (
 def create_app():
 
     app = Flask(__name__)
-
+    CORS(app)
 
     # JWT config
     app.config["JWT_SECRET_KEY"] = "packet-analyzer-secret-key"

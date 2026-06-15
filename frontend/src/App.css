@@ -1,0 +1,439 @@
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:"Inter",Arial,sans-serif;
+}
+
+
+body{
+
+  background:#f4f7fb;
+  color:#1f2937;
+
+}
+
+
+/* ---------- AUTH ---------- */
+
+
+.auth-page{
+
+  height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  background:linear-gradient(
+  135deg,
+  #2563eb,
+  #0f172a
+  );
+
+}
+
+
+
+.auth-card{
+
+  width:380px;
+  background:white;
+  padding:35px;
+  border-radius:18px;
+  box-shadow:0 20px 50px rgba(0,0,0,0.2);
+
+}
+
+
+
+.auth-card h1{
+
+  margin-bottom:10px;
+
+}
+
+
+
+.auth-card input{
+
+  width:100%;
+  padding:12px;
+  margin:10px 0;
+  border:1px solid #ddd;
+  border-radius:10px;
+
+}
+
+
+
+.auth-card button{
+
+  width:100%;
+  padding:12px;
+  border:none;
+  border-radius:10px;
+  background:#2563eb;
+  color:white;
+  cursor:pointer;
+  margin-top:10px;
+
+}
+
+
+
+.secondary-btn{
+
+  background:#111827 !important;
+
+}
+
+
+.error{
+
+  color:red;
+  margin-top:10px;
+
+}
+
+
+
+
+/* ---------- LAYOUT ---------- */
+
+
+.layout{
+
+  display:flex;
+  min-height:100vh;
+
+}
+
+
+
+.main{
+
+  flex:1;
+
+}
+
+
+
+
+
+/* ---------- SIDEBAR ---------- */
+
+
+.sidebar{
+
+  width:230px;
+  background:#0f172a;
+  color:white;
+  padding:25px;
+
+}
+
+
+
+.sidebar h2{
+
+  margin-bottom:30px;
+
+}
+
+
+
+.menu-item{
+
+  display:flex;
+  gap:12px;
+  align-items:center;
+  padding:14px;
+  margin:10px 0;
+  border-radius:10px;
+  cursor:pointer;
+
+}
+
+
+
+.menu-item:hover{
+
+  background:#1e293b;
+
+}
+
+
+
+
+
+/* ---------- NAVBAR ---------- */
+
+
+.navbar{
+
+  height:75px;
+  background:white;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:0 30px;
+  box-shadow:0 3px 15px #ddd;
+
+}
+
+
+
+.nav-right{
+
+  display:flex;
+  gap:10px;
+
+}
+
+
+
+.nav-right button{
+
+  display:flex;
+  align-items:center;
+  gap:8px;
+  border:none;
+  padding:10px 15px;
+  border-radius:10px;
+  cursor:pointer;
+  background:#2563eb;
+  color:white;
+
+}
+
+
+
+
+
+/* ---------- DASHBOARD ---------- */
+
+
+.dashboard{
+
+  padding:30px;
+
+}
+
+
+
+.stats{
+
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:20px;
+  margin-top:25px;
+
+}
+
+
+
+.stat-card{
+
+  background:white;
+  padding:25px;
+  border-radius:18px;
+  display:flex;
+  gap:20px;
+  align-items:center;
+  box-shadow:0 5px 20px #ddd;
+
+}
+
+
+
+
+.dashboard-grid{
+
+  margin-top:25px;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:25px;
+
+}
+
+
+
+.chart-card,
+.alert-card,
+.report-card,
+.upload-card{
+
+  background:white;
+  padding:25px;
+  border-radius:18px;
+  box-shadow:0 5px 20px #ddd;
+
+}
+
+
+
+
+
+/* ---------- TABLE ---------- */
+
+
+table{
+
+  width:100%;
+  border-collapse:collapse;
+  margin-top:15px;
+
+}
+
+
+
+th,td{
+
+  padding:14px;
+  border-bottom:1px solid #ddd;
+  text-align:left;
+
+}
+
+
+
+tr{
+
+  cursor:pointer;
+
+}
+
+
+
+tr:hover{
+
+  background:#f1f5f9;
+
+}
+
+
+
+
+
+/* ---------- ALERT ---------- */
+
+
+.alert-header{
+
+  display:flex;
+  gap:10px;
+  align-items:center;
+
+}
+
+
+
+.alert-item{
+
+  margin-top:15px;
+  padding:12px;
+  background:#fee2e2;
+  border-radius:10px;
+
+}
+
+
+
+
+/* ---------- UPLOAD ---------- */
+
+
+.upload-page{
+
+  padding:40px;
+
+}
+
+
+
+.upload-card{
+
+  max-width:600px;
+  margin:auto;
+  text-align:center;
+
+}
+
+
+
+.upload-card input{
+
+  margin:20px;
+
+}
+
+
+
+.upload-card button{
+
+  padding:14px 25px;
+  border:none;
+  border-radius:10px;
+  background:#2563eb;
+  color:white;
+  cursor:pointer;
+
+}
+
+
+
+.file-info{
+
+  display:flex;
+  justify-content:center;
+  gap:10px;
+  margin:15px;
+
+}
+
+
+
+
+/* ---------- REPORT ---------- */
+
+
+.report-page{
+
+  padding:30px;
+
+}
+
+
+
+.report-grid{
+
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:20px;
+  margin:20px 0;
+
+}
+
+
+
+/* responsive */
+
+@media(max-width:900px){
+
+
+.sidebar{
+
+  display:none;
+
+}
+
+
+.stats,
+.dashboard-grid,
+.report-grid{
+
+  grid-template-columns:1fr;
+
+}
+
+
+}

@@ -74,7 +74,7 @@ console.log(err);
 const serverMessage = err.response?.data?.details || err.response?.data?.error || err.response?.data?.msg;
 
 setMessage(
-serverMessage || "Upload failed. Check backend deployment and try again."
+serverMessage || "Upload failed. Please upload a different file."
 );
 
 

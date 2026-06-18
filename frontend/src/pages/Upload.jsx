@@ -86,9 +86,9 @@ catch(err){
 
 console.log(err);
 
-const serverMessage = err.response?.data?.details || err.response?.data?.error;
+const serverMessage = err.response?.data?.details || err.response?.data?.error || err.response?.data?.msg;
 
-if(err.response?.status===401){
+if(err.response?.status===401 || err.response?.status===422){
 
 setMessage(
 "Session expired. Login again"

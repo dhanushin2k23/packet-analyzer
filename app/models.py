@@ -6,6 +6,19 @@ from sqlalchemy import JSON
 from app.extensions import bcrypt
 
 class AnalysisReport(db.Model):
+    user_id = db.Column(
+        db.Integer,
+        db.ForeignKey("user.id"),
+        nullable=False
+    )
+
+
+    user = db.relationship(
+        "User",
+        backref="reports"
+    )
+
+    
     id=db.Column(
         db.Integer,
         primary_key = True

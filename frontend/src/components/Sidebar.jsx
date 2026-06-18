@@ -60,7 +60,7 @@ Upload PCAP
 
 <div
 className="menu-item"
-onClick={()=>navigate("/dashboard")}
+onClick={()=>navigate("/report/1")}
 >
 
 <FileText size={20}/>
@@ -75,7 +75,7 @@ Reports
 
 <div
 className="menu-item"
-onClick={()=>navigate("/dashboard")}
+onClick={()=>navigate("/security")}
 >
 
 <ShieldAlert size={20}/>

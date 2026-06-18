@@ -1,5 +1,5 @@
 import {BrowserRouter, Routes, Route} from "react-router-dom";
-
+import Security from "./components/Security";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
@@ -30,6 +30,8 @@ return (
 
 
 <Route path="/report/:id" element={<Report/>}/>
+
+<Route path="/security" element={<Security/>}/>
 
 
 </Routes>

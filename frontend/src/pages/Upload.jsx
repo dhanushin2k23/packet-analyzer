@@ -1,5 +1,5 @@
 import { useState } from "react";
-import axios from "axios";
+import api from "../api/axios";
 
 import Navbar from "../components/Navbar";
 import Sidebar from "../components/Sidebar";
@@ -59,30 +59,11 @@ setLoading(true);
 
 
 
-const token = localStorage.getItem("token");
+const res = await api.post(
 
+"/upload",
 
-
-const res = await axios.post(
-
-"http://127.0.0.1:5000/upload",
-
-formData,
-
-{
-
-headers:{
-
-Authorization:
-`Bearer ${token}`,
-
-"Content-Type":
-"multipart/form-data"
-
-}
-
-}
-
+formData
 );
 
 
@@ -199,7 +180,7 @@ Upload network capture file for traffic analysis
 
 type="file"
 
-accept=".pcap"
+accept=".pcap,.pcapng"
 
 onChange={(e)=>
 setFile(e.target.files[0])

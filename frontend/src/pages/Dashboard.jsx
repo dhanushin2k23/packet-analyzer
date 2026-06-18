@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import api from "../api/axios";
 
 import Navbar from "../components/Navbar";
 import Sidebar from "../components/Sidebar";
@@ -36,20 +36,7 @@ const getReports = async()=>{
 try{
 
 
-const token = localStorage.getItem("token");
-
-
-const res = await axios.get(
-
-"http://127.0.0.1:5000/reports",
-
-{
-headers:{
-Authorization:`Bearer ${token}`
-}
-}
-
-);
+const res = await api.get("/reports");
 
 
 setReports(res.data);

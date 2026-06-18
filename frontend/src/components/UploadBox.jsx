@@ -1,5 +1,5 @@
 import { useState } from "react";
-import axios from "axios";
+import api from "../api/axios";
 
 import {
   UploadCloud,
@@ -45,29 +45,11 @@ file
 try{
 
 
-const token = localStorage.getItem("token");
+const res = await api.post(
 
+"/upload",
 
-
-const res = await axios.post(
-
-"http://127.0.0.1:5000/upload",
-
-formData,
-
-{
-headers:{
-
-Authorization:
-`Bearer ${token}`,
-
-"Content-Type":
-"multipart/form-data"
-
-}
-
-}
-
+formData
 );
 
 
@@ -126,7 +108,7 @@ Upload PCAP File
 
 type="file"
 
-accept=".pcap"
+accept=".pcap,.pcapng"
 
 onChange={(e)=>
 setFile(e.target.files[0])

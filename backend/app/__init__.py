@@ -1,9 +1,14 @@
-from flask import Flask, request, jsonify
 import os
 import uuid
 from datetime import timedelta
+from pathlib import Path
+
+from flask import Flask, request, jsonify
 from dotenv import load_dotenv
 from flask_cors import CORS
+from werkzeug.exceptions import RequestEntityTooLarge
+from werkzeug.utils import secure_filename
+
 from app.database import db
 from app.models import AnalysisReport
 from app.services.pcap_parser import analyze_pcap
@@ -17,41 +22,83 @@ from flask_jwt_extended import (
 )
 
 
+ALLOWED_EXTENSIONS = {".pcap", ".pcapng"}
+DEFAULT_MAX_UPLOAD_MB = 25
+
+
+def _csv_env(name, default=""):
+    return [
+        item.strip()
+        for item in os.getenv(name, default).split(",")
+        if item.strip()
+    ]
+
+
+def _required_env(name):
+    value = os.getenv(name)
+    if not value:
+        raise RuntimeError(f"{name} environment variable is required")
+    return value
+
+
+def _is_allowed_capture(filename):
+    return Path(filename).suffix.lower() in ALLOWED_EXTENSIONS
+
+
 def create_app():
 
-    app = Flask(__name__)
     load_dotenv()
+    app = Flask(__name__)
+
+    is_production = os.getenv("FLASK_ENV") == "production"
+
+    if is_production:
+        secret_key = _required_env("SECRET_KEY")
+        jwt_secret_key = _required_env("JWT_SECRET_KEY")
+        database_url = _required_env("DATABASE_URL")
+        default_cors_origins = ""
+        _required_env("CORS_ORIGINS")
+    else:
+        secret_key = os.getenv("SECRET_KEY", "dev-secret-key-change-me")
+        jwt_secret_key = os.getenv("JWT_SECRET_KEY", "dev-jwt-secret-change-me")
+        database_url = os.getenv("DATABASE_URL", "sqlite:///packet_analyzer.db")
+        default_cors_origins = "http://localhost:5173,http://127.0.0.1:5173"
+
+    cors_origins = _csv_env(
+        "CORS_ORIGINS",
+        default_cors_origins
+    )
+    if not cors_origins:
+        raise RuntimeError("CORS_ORIGINS must include at least one origin")
+
     CORS(
         app,
-        origins=[
-            "http://localhost:5173"
-        ]
+        origins=cors_origins,
+        supports_credentials=False
     )
 
 
     # =====================
     # JWT CONFIG
     # =====================
-    app.config["SECRET_KEY"] = os.getenv(
-        "SECRET_KEY"
-    )
+    app.config["SECRET_KEY"] = secret_key
 
-    app.config["JWT_SECRET_KEY"] = os.getenv(
-        "JWT_SECRET_KEY"
-    )
+    app.config["JWT_SECRET_KEY"] = jwt_secret_key
 
     app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(
         hours=2
     )
+
+    app.config["MAX_CONTENT_LENGTH"] = int(
+        os.getenv("MAX_UPLOAD_MB", DEFAULT_MAX_UPLOAD_MB)
+    ) * 1024 * 1024
 
 
     # =====================
     # DATABASE CONFIG
     # =====================
 
-    app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv(
-        "DATABASE_URL"
-    )
+    app.config["SQLALCHEMY_DATABASE_URI"] = database_url
 
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
@@ -77,9 +124,21 @@ def create_app():
 
 
 
-    # Create tables
+    # Create tables for the current lightweight deployment setup.
     with app.app_context():
         db.create_all()
+
+    @app.errorhandler(RequestEntityTooLarge)
+    def handle_large_upload(_error):
+        return jsonify({
+            "error": "Uploaded file is too large"
+        }), 413
+
+    @app.route("/health", methods=["GET"])
+    def health():
+        return jsonify({
+            "status": "ok"
+        })
 
 
 
@@ -104,30 +163,30 @@ def create_app():
 
 
 
-        if not file.filename.endswith(".pcap"):
+        if not _is_allowed_capture(file.filename):
             return jsonify({
-                "error": "Only PCAP files allowed"
+                "error": "Only PCAP or PCAPNG files allowed"
             }), 400
 
-
-
-        UPLOAD_FOLDER = os.getenv(
+        upload_folder = Path(os.getenv(
             "UPLOAD_FOLDER",
             "uploads"
-        )
+        ))
 
-        os.makedirs(
-            UPLOAD_FOLDER,
+        upload_folder.mkdir(
+            parents=True,
             exist_ok=True
         )
 
-        unique_name = f"{uuid.uuid4()}_{file.filename}"
+        original_filename = secure_filename(file.filename)
+        if not original_filename:
+            return jsonify({
+                "error": "Invalid file name"
+            }), 400
 
-        filepath = os.path.join(
-            UPLOAD_FOLDER,
-            unique_name
-        )
+        unique_name = f"{uuid.uuid4()}_{original_filename}"
 
+        filepath = upload_folder / unique_name
 
         file.save(filepath)
 
@@ -135,22 +194,28 @@ def create_app():
 
         try:
 
-            result = analyze_pcap(filepath)
+            result = analyze_pcap(str(filepath))
 
 
         except Exception as e:
 
-            return jsonify({
+            response = {
                 "error": "Failed to analyze file",
-                "details": str(e)
-            }), 500
+            }
+            if not is_production:
+                response["details"] = str(e)
+
+            return jsonify(response), 500
+
+        finally:
+            filepath.unlink(missing_ok=True)
 
 
 
 
         report = AnalysisReport(
 
-            filename=file.filename,
+            filename=original_filename,
 
             user_id=current_user,
 
@@ -209,6 +274,8 @@ def create_app():
 
         reports = AnalysisReport.query.filter_by(
             user_id=current_user
+        ).order_by(
+            AnalysisReport.created_at.desc()
         ).all()
 
 
@@ -233,7 +300,9 @@ def create_app():
 
                 "icmp_packets": report.icmp_packets,
 
-                "created_at": report.created_at
+                "created_at": report.created_at,
+
+                "security_alerts": report.security_alerts
 
             })
 

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+import api from "../api/axios";
 
 import Navbar from "./Navbar";
 import Sidebar from "./Sidebar";
@@ -16,17 +16,7 @@ const [alerts,setAlerts] = useState([]);
 useEffect(()=>{
 
 
-const token = localStorage.getItem("token");
-
-
-axios.get(
-"http://127.0.0.1:5000/reports",
-{
-headers:{
-Authorization:`Bearer ${token}`
-}
-}
-)
+api.get("/reports")
 .then((res)=>{
 
 

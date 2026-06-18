@@ -13,7 +13,7 @@ auth = Blueprint(
 @auth.route("/register", methods=["POST"])
 def register():
 
-    data = request.get_json()
+    data = request.get_json(silent=True) or {}
 
 
     username = data.get("username")
@@ -24,6 +24,14 @@ def register():
     if not username or not email or not password:
         return jsonify({
             "error": "Missing fields"
+        }), 400
+
+    username = username.strip()
+    email = email.strip().lower()
+
+    if len(password) < 8:
+        return jsonify({
+            "error": "Password must be at least 8 characters"
         }), 400
 
 
@@ -58,10 +66,15 @@ def register():
 @auth.route("/login", methods=["POST"])
 def login():
 
-    data = request.get_json()
+    data = request.get_json(silent=True) or {}
 
-    email = data.get("email")
+    email = (data.get("email") or "").strip().lower()
     password = data.get("password")
+
+    if not email or not password:
+        return jsonify({
+            "error": "Missing credentials"
+        }), 400
 
 
     user = User.query.filter_by(

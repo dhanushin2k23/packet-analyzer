@@ -45,6 +45,10 @@ def _is_allowed_capture(filename):
     return Path(filename).suffix.lower() in ALLOWED_EXTENSIONS
 
 
+def _current_user_id():
+    return int(get_jwt_identity())
+
+
 def create_app():
 
     load_dotenv()
@@ -150,7 +154,7 @@ def create_app():
     @jwt_required()
     def upload():
 
-        current_user = get_jwt_identity()
+        current_user = _current_user_id()
 
 
         file = request.files.get("file")
@@ -199,6 +203,8 @@ def create_app():
 
         except Exception as e:
 
+            app.logger.exception("PCAP analysis failed")
+
             response = {
                 "error": "Failed to analyze file",
             }
@@ -241,9 +247,25 @@ def create_app():
 
 
 
-        db.session.add(report)
+        try:
 
-        db.session.commit()
+            db.session.add(report)
+
+            db.session.commit()
+
+        except Exception as e:
+
+            db.session.rollback()
+
+            app.logger.exception("Failed to save analysis report")
+
+            response = {
+                "error": "Failed to save analysis report"
+            }
+            if not is_production:
+                response["details"] = str(e)
+
+            return jsonify(response), 500
 
 
 
@@ -268,7 +290,7 @@ def create_app():
     def get_reports():
 
 
-        current_user = get_jwt_identity()
+        current_user = _current_user_id()
 
 
 
@@ -323,7 +345,7 @@ def create_app():
     def get_report(report_id):
 
 
-        current_user = get_jwt_identity()
+        current_user = _current_user_id()
 
 
 

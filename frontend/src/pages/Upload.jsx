@@ -86,6 +86,7 @@ catch(err){
 
 console.log(err);
 
+const serverMessage = err.response?.data?.details || err.response?.data?.error;
 
 if(err.response?.status===401){
 
@@ -98,7 +99,7 @@ setMessage(
 else{
 
 setMessage(
-"Upload failed"
+serverMessage || "Upload failed. Check backend deployment and try again."
 );
 
 }

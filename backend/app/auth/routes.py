@@ -1,6 +1,5 @@
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import create_access_token
-from flask_jwt_extended import jwt_required, get_jwt_identity
 from app.models import User
 from app.database import db
 
@@ -95,7 +94,7 @@ def login():
 
 
     token = create_access_token(
-        identity=user.id
+        identity=str(user.id)
     )
 
 

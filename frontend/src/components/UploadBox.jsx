@@ -71,9 +71,10 @@ catch(err){
 
 console.log(err);
 
+const serverMessage = err.response?.data?.details || err.response?.data?.error;
 
 setMessage(
-"Upload failed"
+serverMessage || "Upload failed. Check backend deployment and try again."
 );
 
 

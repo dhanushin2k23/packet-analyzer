@@ -274,7 +274,8 @@ def create_app():
 
 
         return jsonify({
-            "report_id": report.id,
+            "id": report.id,
+            "filename": original_filename,
             **result
         })
 

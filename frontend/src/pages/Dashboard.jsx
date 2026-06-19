@@ -1,5 +1,8 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import {
+  useNavigate,
+  useLocation
+} from "react-router-dom";
 import api from "../api/axios";
 
 import Navbar from "../components/Navbar";
@@ -20,7 +23,8 @@ function Dashboard(){
 
 
 const navigate = useNavigate();
-
+const navigate = useNavigate();
+const location = useLocation();
 
 const [reports,setReports] = useState([]);
 
@@ -29,19 +33,26 @@ const [reports,setReports] = useState([]);
 
 useEffect(()=>{
 
-
 const getReports = async()=>{
-
 
 try{
 
-
 const res = await api.get("/reports");
 
+let data = res.data;
 
-setReports(res.data);
+if(location.state?.newReport){
 
+data = [
+location.state.newReport,
+...data.filter(
+r => r.id !== location.state.newReport.id
+)
+];
 
+}
+
+setReports(data);
 
 }
 
@@ -51,18 +62,11 @@ console.log(err);
 
 }
 
-
-
 }
-
-
 
 getReports();
 
-
-
-},[]);
-
+},[location.state]);
 
 
 

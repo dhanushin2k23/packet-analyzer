@@ -3,7 +3,7 @@ import api from "../api/axios";
 
 import Navbar from "../components/Navbar";
 import Sidebar from "../components/Sidebar";
-
+import { useNavigate } from "react-router-dom";
 import {
   UploadCloud,
   FileCheck
@@ -13,7 +13,7 @@ import {
 
 function Upload(){
 
-
+const navigate = useNavigate();
 const [file,setFile] = useState(null);
 
 const [message,setMessage] = useState("");
@@ -73,10 +73,11 @@ setMessage(
 "PCAP analyzed successfully"
 );
 
-
-
-console.log(res.data);
-
+navigate("/dashboard", {
+  state: {
+    newReport: res.data
+  }
+});
 
 
 }

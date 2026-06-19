@@ -123,7 +123,7 @@ Returns `201` on success, `409` if the email is already registered.
 
 ```json
 {
-  "email": "dhanush@example.com",
+  "email": "example@example.com",
   "password": "yourpassword"
 }
 ```
